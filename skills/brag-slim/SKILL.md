@@ -1,6 +1,6 @@
 ---
 name: brag-slim
-description: Turn a project directory or a website URL into a short, shareable launch video with music, motion, and share copy. One file, no bundled assets — built entirely by the model with the tools already on the machine. Use when someone says "/brag-slim", "let's /brag about this", "brag about a website", "make a launch video", or wants to show off what they built. If the /brag skill is also installed, let /brag handle those phrases; it hands off here on Opus 5.5.
+description: Turn a project directory or a website URL into a shareable launch video (60s by default) with music, motion, and share copy. One file, no bundled assets — built entirely by the model with the tools already on the machine. Use when someone says "/brag-slim", "let's /brag about this", "brag about a website", "make a launch video", or wants to show off what they built. If the /brag skill is also installed, let /brag handle those phrases; it hands off here on Opus 5.5.
 ---
 
 # /brag-slim
@@ -15,7 +15,8 @@ Usage: `/brag-slim [input] [options]`. Options (flags or plain language):
 |---|---|
 | `--tone <preset or freeform>` | inferred; `default` if nothing clearly fits |
 | `--format landscape\|vertical\|square` | landscape (1920×1080; vertical 1080×1920, square 1080×1080), 30fps |
-| `--duration <s>` | about 20s |
+| `--duration <s>` | 60s; an explicit value overrides it |
+| `--voice` | off; on adds a scene-synced narrator (see Narration) |
 
 Write the deliverables to `brag-output/` in the current directory (timestamped `brag-output-YYYY-MM-DD-HHmmss/` if it already exists). Keep every intermediate file (frames, downloads, scripts, stems) in a `work/` subfolder inside it.
 
@@ -56,15 +57,15 @@ Everything gathered here can end up in a public video. Never carry secrets, API 
 
 ## 2. Plan
 
-Write `brag-plan.md`: the angle, the hook, 2–3 highlights, the punchline, tone, visual identity, and a scene-by-scene storyboard with durations that sum to the target, with the music's tempo chosen now and every cut on a beat.
+Write `brag-plan.md`: the angle, the hook, the highlights, the punchline, tone, visual identity, and a scene-by-scene storyboard with durations that sum to the target (60s unless `--duration` says otherwise; count them), with the music's tempo chosen now and every cut on a beat.
 
 If the user points at one part — a new version, a new feature, one angle — make this the focus of the video.
 
-**Shape:** Hook (2–3s) → Reveal (2–4s) → 2–3 sharp highlights → Punchline/outro (2–4s). A starting shape, not a template.
+**Shape:** Hook (2–3s) → Reveal (2–4s) → sharp highlights → Punchline/outro (2–4s). A starting shape, not a template. At 60s, fill the time with more real highlights (roughly 6–9, often walking entry → key action → result), not a few scenes stretched with long holds. For a short `--duration` (15–25s), 2–3 highlights is right.
 
 ## Creative laws
 
-- **Short.** 15–25 seconds; 18–22 is the sweet spot.
+- **On length.** 60 seconds by default (55–65s is on target); an explicit `--duration` wins. Every second earns its place: if the material runs thin, add another real highlight rather than padding holds.
 - **Clear to a stranger.** After one viewing, someone who's never heard of it knows what it does, who it's for, and how to get it. Lead with that, not with how it's built.
 - **The hook is everything.** The first 2 seconds decide whether anyone keeps watching. Plan it first.
 - **Show the thing.** Reuse the real thing from the source — its UI, components, copy, images, videos and animations — rather than re-creating it. Rebuild only what you can't reuse. Prefer the working app doing its job over a landing page describing it. Small illustrative UI text is fine when showing the product in use (a filename, an "Exported" toast); invented claims, numbers, or testimonials are not. Never abstract filler.
@@ -76,7 +77,7 @@ If the user points at one part — a new version, a new feature, one angle — m
 
 ## Tones
 
-Presets are defaults; freeform direction ("fake Series A launch from 2016") refines or overrides them.
+Presets are defaults; freeform direction ("fake Series A launch from 2016") refines or overrides them. Scene counts below are for a 15–25s edit; keep each tone's pacing character and scale the count with the duration (roughly triple at 60s).
 
 | Tone | Feel | Pacing / transitions |
 |---|---|---|
@@ -91,6 +92,16 @@ Presets are defaults; freeform direction ("fake Series A launch from 2016") refi
 ## Sound
 
 Write the music and sound effects as one piece: effects in the same key and the same space as the music, blended in rather than laid on top. Give it a basic, proper mix, the way a real track is mixed: effects sit softly under the music, nothing harsh or spiky, and repeated little sounds stay in the background. Every part (drums, bass, melody, and effects on cuts) plays on that one beat grid, counted from the first frame, so nothing drifts or flams against anything else.
+
+## Narration (`--voice` only)
+
+Without `--voice`, make no voiceover at all. With it, the narrator is a presenter walking a stranger through this specific project:
+
+- **Open with the project:** the first line says what it is and what problem it solves.
+- **Explain, don't read:** for each scene, say what the screen is for, why the user takes the action shown, and what it does for them. Never restate visible text; no filler ("As you can see…", "In this video…").
+- **Write per scene:** add a `Narration:` line to each storyboard scene and a `## Voiceover script` section to `brag-plan.md`, one line per scene.
+- **Sync per scene:** generate one TTS clip per scene with a local TTS tool, size each scene to its clip plus a 0.3–0.6s pad, and start each clip at its scene's start so the voice never drifts. Duck the music under the voice. If the script overruns the target duration, cut words, not the edit's pace.
+- **Captions:** burn in captions matching the narration, readable and clear of the platform's overlays.
 
 ## 3. Build, check, render
 
